@@ -34,37 +34,61 @@ export function execute(interaction: CommandInteraction, client: BotClient) {
             minesweeper[i][j] = minesweeper[i][j].replaceAll(":", "");
         }
     }
-    client.minesweeperGames.set(interaction.user.id, {
-        matrix: minesweeper,
-        revealed: revealed,
-        flagged: [],
-        flagLimit: mines + 1,
-        turn: 0,
-        remainingHP: 3,
-        starterID: interaction.user.id
-    })
-    const row = new MessageActionRow()
-        .addComponents(
-            new MessageButton()
-                .setCustomId("ms-start")
-                .setLabel("Yes")
-                .setStyle("SUCCESS"),
-            new MessageButton()
-                .setCustomId("ms-cancel")
-                .setLabel("No")
-                .setStyle("DANGER"),
-            new MessageButton()
-                .setURL("https://gist.github.com/thisusernameisnottakenyet/bd01ff10ebf2d30d0ed0387792f2671d")
-                .setLabel("How to play")
-                .setStyle("LINK")
-        );
     const mode = interaction.options.getString("mode")!;
     if (mode == "multi") {
+        client.minesweeperGames.set(interaction.channelId, {
+            matrix: minesweeper,
+            revealed: revealed,
+            flagged: [],
+            flagLimit: mines + 1,
+            turn: 0,
+            remainingHP: 3,
+            id: interaction.channelId
+        })
+        const row = new MessageActionRow()
+            .addComponents(
+                new MessageButton()
+                    .setCustomId("ms-start-" + interaction.channelId)
+                    .setLabel("Yes")
+                    .setStyle("SUCCESS"),
+                new MessageButton()
+                    .setCustomId("ms-cancel-" + interaction.channelId)
+                    .setLabel("No")
+                    .setStyle("DANGER"),
+                new MessageButton()
+                    .setURL("https://gist.github.com/thisusernameisnottakenyet/bd01ff10ebf2d30d0ed0387792f2671d")
+                    .setLabel("How to play")
+                    .setStyle("LINK")
+            );
         interaction.reply({
             content: "This game is better when played on desktop due to the first line being perfectly lined up with the grid.\n\nThis is a multiplayer game. Please note that everyone can reveal a tile, flag a tile or end the game at anytime.\nDo you **really** want to start the game?",
             components: [row],
         })
     } else {
+        client.minesweeperGames.set(interaction.user.id, {
+            matrix: minesweeper,
+            revealed: revealed,
+            flagged: [],
+            flagLimit: mines + 1,
+            turn: 0,
+            remainingHP: 3,
+            id: interaction.user.id
+        })
+        const row = new MessageActionRow()
+            .addComponents(
+                new MessageButton()
+                    .setCustomId("ms-start-" + interaction.user.id)
+                    .setLabel("Yes")
+                    .setStyle("SUCCESS"),
+                new MessageButton()
+                    .setCustomId("ms-cancel-" + interaction.user.id)
+                    .setLabel("No")
+                    .setStyle("DANGER"),
+                new MessageButton()
+                    .setURL("https://gist.github.com/thisusernameisnottakenyet/bd01ff10ebf2d30d0ed0387792f2671d")
+                    .setLabel("How to play")
+                    .setStyle("LINK")
+            );
         interaction.reply({
             content: "This game is better when played on desktop due to the first line being perfectly lined up with the grid.\n\nDo you want to start the game?",
             components: [row],

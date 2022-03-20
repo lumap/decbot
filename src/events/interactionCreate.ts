@@ -3,6 +3,7 @@ import BotClient from "../classes/Client";
 import * as discordModals from "discord-modals"
 import { renderGrid } from "../functions/renderGrid";
 import { msButtons } from "../constants/msButtons";
+import { fixId } from "../functions/fixId";
 
 export function event(interaction: Interaction, client: BotClient) {
     if (interaction.isCommand()) {
@@ -10,22 +11,27 @@ export function event(interaction: Interaction, client: BotClient) {
         if (!cmd) return console.log(interaction.commandName)
         cmd.execute(interaction, client)
     } else if (interaction.isButton()) {
-        switch (interaction.customId) {
+        const gameId = interaction.customId.split("-")[interaction.customId.split("-").length - 1]
+        switch (fixId(interaction.customId)) {
             case "ms-start": {
+                msButtons.components[0].setCustomId("ms-flag-" + gameId)
+                msButtons.components[1].setCustomId("ms-unflag-" + gameId)
+                msButtons.components[2].setCustomId("ms-reveal-" + gameId)
+                msButtons.components[3].setCustomId("ms-stop-game-" + gameId)
                 interaction.update({
-                    content: renderGrid(client.minesweeperGames.get(interaction.user.id), false),
+                    content: renderGrid(client.minesweeperGames.get(gameId), false),
                     components: [msButtons],
                 })
                 break;
             }
             case "ms-cancel": {
                 interaction.update({ content: "Ok...", components: [] })
-                client.minesweeperGames.delete(interaction.user.id)
+                client.minesweeperGames.delete(gameId)
                 break;
             }
             case "ms-flag": {
                 const flagModal = new discordModals.Modal()
-                    .setCustomId("ms-flag")
+                    .setCustomId("ms-flag-" + gameId)
                     .setTitle("Interact with the grid")
                 flagModal.components = [
                     new discordModals.TextInputComponent()
@@ -45,7 +51,7 @@ export function event(interaction: Interaction, client: BotClient) {
             }
             case "ms-unflag": {
                 const unflagModal = new discordModals.Modal()
-                    .setCustomId("ms-unflag")
+                    .setCustomId("ms-unflag-" + gameId)
                     .setTitle("Interact with the grid")
                 unflagModal.components = [
                     new discordModals.TextInputComponent()
@@ -65,7 +71,7 @@ export function event(interaction: Interaction, client: BotClient) {
             }
             case "ms-reveal": {
                 const revealModal = new discordModals.Modal()
-                    .setCustomId("ms-reveal")
+                    .setCustomId("ms-reveal-" + gameId)
                     .setTitle("Interact with the grid")
                 revealModal.components = [new discordModals.TextInputComponent()
                     .setCustomId("ms-box")
@@ -84,8 +90,8 @@ export function event(interaction: Interaction, client: BotClient) {
             }
             case "ms-stop-game": {
                 interaction.update({
-                    components: [], content: renderGrid(client.minesweeperGames.get(interaction.user.id), true)
-                }).then(() => client.minesweeperGames.delete(interaction.user.id))
+                    components: [], content: renderGrid(client.minesweeperGames.get(gameId), true)
+                }).then(() => client.minesweeperGames.delete(gameId))
                 break;
             }
             default: {

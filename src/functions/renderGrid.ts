@@ -2,7 +2,7 @@ import { emojis } from "../constants/emojis"
 import { numToEmojis } from "./numToEmojis";
 
 export function renderGrid(game, ended: boolean) {
-    let str = `_ _     x→:one::two::three::four::five::six::seven::eight:\ny↓\n`;
+    let str = `_ _     y→:one::two::three::four::five::six::seven::eight:\nx↓\n`;
     if (!ended) ended = false
     if (!game) return "oopsie;"
     for (let i = 0; i < game.matrix.length; i++) {

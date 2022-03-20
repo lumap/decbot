@@ -1,12 +1,13 @@
 import { ModalSubmitInteraction } from "discord-modals";
 import BotClient from "../classes/Client";
 import { renderGrid } from "../functions/renderGrid";
-import { letterToNum } from "../functions/letterToNum";
 import { msButtons } from "../constants/msButtons";
+import { fixId } from "../functions/fixId";
 
 export async function event(modal: ModalSubmitInteraction, client: BotClient) {
     let box = modal.getTextInputValue("ms-box"), tile_str = "", tile: number[] = [];
-    const game = client.minesweeperGames.get(modal.user.id);
+    const gameId = modal.customId.split("-")[modal.customId.split("-").length - 1]
+    const game = client.minesweeperGames.get(gameId)
     if (!game) {
         await modal.deferReply({ ephemeral: true })
         return modal.followUp({
@@ -30,7 +31,7 @@ export async function event(modal: ModalSubmitInteraction, client: BotClient) {
             content: "Something wrong happened when trying to see which tile you've selected, please try again",
         })
     }
-    switch (modal.customId) {
+    switch (fixId(modal.customId)) {
         case "ms-reveal": {
             if (game.flagged.includes("" + tile_str)) {
                 game.flagged = game.flagged.filter(i => i != "" + tile_str)
@@ -46,7 +47,7 @@ export async function event(modal: ModalSubmitInteraction, client: BotClient) {
             if (box_content == "boom") {
                 game.remainingHP -= 1
                 if (game.remainingHP == 0) {
-                    modal.update({ components: [], content: renderGrid(client.minesweeperGames.get(modal.member.id), true) }).then(() => client.minesweeperGames.delete(modal.member.id))
+                    modal.update({ components: [], content: renderGrid(game, true) }).then(() => client.minesweeperGames.delete(game.id))
                     return;
                 }
                 game.revealed.push("" + tile_str)
@@ -82,10 +83,14 @@ export async function event(modal: ModalSubmitInteraction, client: BotClient) {
         }
     }
     game.turn += 1;
-    client.minesweeperGames.set(modal.member.id, game)
+    client.minesweeperGames.set(game.id, game)
 
+    msButtons.components[0].setCustomId("ms-flag-" + game.id)
+    msButtons.components[1].setCustomId("ms-unflag-" + game.id)
+    msButtons.components[2].setCustomId("ms-reveal-" + game.id)
+    msButtons.components[3].setCustomId("ms-stop-game-" + game.id)
     modal.update({
-        content: renderGrid(client.minesweeperGames.get(modal.member.id), false),
+        content: renderGrid(game, false),
         components: [msButtons]
     })
 }
