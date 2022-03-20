@@ -4,34 +4,41 @@ import { renderGrid } from "../functions/renderGrid";
 import { letterToNum } from "../functions/letterToNum";
 import { msButtons } from "../constants/msButtons";
 
-export function event(modal: ModalSubmitInteraction, client: BotClient) {
-    let box = modal.getTextInputValue('ms-box'), tile_str = "", tile: number[] = [];
-    const game = client.minesweeperGames.get(modal.member.id)!;
+export async function event(modal: ModalSubmitInteraction, client: BotClient) {
+    let box = modal.getTextInputValue("ms-box"), tile_str = "", tile: number[] = [];
+    const game = client.minesweeperGames.get(modal.user.id);
+    if (!game) {
+        await modal.deferReply({ ephemeral: true })
+        return modal.followUp({
+            content: "oopsie happened, or the bot restarted, sorry",
+            ephemeral: true
+        })
+    }
     try {
-        tile = [parseInt(box[1]) - 1, letterToNum(box[0])]
+        tile = [parseInt(box[0]) - 1, parseInt(box[2]) - 1]
         tile_str = `${tile[0]} ${tile[1]}`
-        if (!game.matrix[tile[0]] || !game.matrix[0][tile[1]] || tile[0] < -1 || tile[0] > 6 || tile[1] < -1 || tile[1] > 8) {
-            return modal.reply({
-                content: "This tile does not seem to exist",
-                ephemeral: true //DOSNT WORK
+        if (box[1] !== "," || !game.matrix[tile[0]] || !game.matrix[0][tile[1]] || tile[0] < -1 || tile[0] > 6 || tile[1] < -1 || tile[1] > 8) {
+            await modal.deferReply({ ephemeral: true })
+            return modal.followUp({
+                content: "This tile does not seem to exist, or it was not inputed correctly",
             })
         }
     } catch (e) {
         console.log(e)
-        return modal.reply({
+        await modal.deferReply({ ephemeral: true })
+        return modal.followUp({
             content: "Something wrong happened when trying to see which tile you've selected, please try again",
-            ephemeral: true //DOESNT WRK
         })
     }
     switch (modal.customId) {
-        case 'ms-reveal': {
+        case "ms-reveal": {
             if (game.flagged.includes("" + tile_str)) {
                 game.flagged = game.flagged.filter(i => i != "" + tile_str)
             }
             if (game.revealed.includes("" + tile_str)) {
-                modal.reply({
+                await modal.deferReply({ ephemeral: true })
+                modal.followUp({
                     content: "This tile has already been revealed!",
-                    ephemeral: true //DOSNT WORK
                 })
                 return;
             }
@@ -48,19 +55,20 @@ export function event(modal: ModalSubmitInteraction, client: BotClient) {
             )
             break;
         }
-        case 'ms-flag': {
+        case "ms-flag": {
             if (game.revealed.includes("" + tile_str)) {
-                modal.reply({
+                await modal.deferReply({ ephemeral: true })
+                modal.followUp({
                     content: "You can not flag a revealed tile!",
-                    ephemeral: true //DOESNT WORK
                 })
                 return;
             }
             game.flagged.push("" + tile_str)
             break;
         }
-        case 'ms-unflag': {
+        case "ms-unflag": {
             if (!game.flagged.includes("" + tile_str)) {
+                await modal.deferReply({ ephemeral: true })
                 modal.reply({
                     content: "You can't unflag a non flagged tile!"
                 })

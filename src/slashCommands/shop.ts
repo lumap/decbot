@@ -3,7 +3,7 @@ import BotClient from "../classes/Client";
 
 export async function execute(interaction: CommandInteraction, client: BotClient) {
     switch (interaction.options.getSubcommand()) {
-        case 'add': { //@ts-ignore
+        case "add": { //@ts-ignore
             if (!interaction.member.roles.cache.has("932115827937923102")) {
                 return interaction.reply({
                     ephemeral: true,
@@ -13,7 +13,7 @@ export async function execute(interaction: CommandInteraction, client: BotClient
             const name = interaction.options.getString("name");
             if (!client.db.get("items")) client.db.set("items", {});
             if (Object.keys(client.db.get("items")).length == 25) return interaction.reply({
-                content: "Sorry, but there's too much items in the shop. Please remove one.",
+                content: "Sorry, but there's too much items in the shop.Please remove one.",
                 ephemeral: true
             })
             if (!!client.db.get(`items.${name}`)) return interaction.reply({
@@ -31,7 +31,7 @@ export async function execute(interaction: CommandInteraction, client: BotClient
             })
             break;
         };
-        case 'delete': { //@ts-ignore
+        case "delete": { //@ts-ignore
             if (!interaction.member.roles.cache.has("932115827937923102")) {
                 return interaction.reply({
                     ephemeral: true,
@@ -45,12 +45,12 @@ export async function execute(interaction: CommandInteraction, client: BotClient
             })
             client.db.delete(`items.${name}`);
             interaction.reply({
-                content: 'Item successfully deleted!',
+                content: "Item successfully deleted!",
                 ephemeral: true
             })
             break;
         };
-        case 'buy': {
+        case "buy": {
             const name = interaction.options.getString("name");
             if (!client.db.get(`items.${name}`)) return interaction.reply({
                 content: "There is no items with this name.",
@@ -79,7 +79,7 @@ export async function execute(interaction: CommandInteraction, client: BotClient
             channel.send(`<@${interaction.user.id}> bought the item **${name}**`)
             break;
         };
-        case 'items': {
+        case "items": {
             const items = client.db.get("items");
             let list = [];
             for (const [key, value] of Object.entries(items)) { //@ts-ignore
