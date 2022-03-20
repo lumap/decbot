@@ -7,5 +7,6 @@ const client = new BotClient({
 })
 
 client.initEvents()
+client.initSlashCommands()
 
 client.login(config.token)

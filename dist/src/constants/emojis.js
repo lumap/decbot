@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.announceCoins = exports.emojis = void 0;
+exports.emojis = void 0;
 exports.emojis = {
     'flagged': '<:flagged:954038024356921474>',
     'boom': '<:bomb:954037997727260692>',
@@ -15,4 +15,3 @@ exports.emojis = {
     'seven': '<:tile7:954038024344313857>',
     'eight': '<:tile8:954038024356921475>'
 };
-exports.announceCoins = "940170551824117801";

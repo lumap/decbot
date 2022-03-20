@@ -33,4 +33,5 @@ const client = new Client_1.default({
     intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.GUILD_MEMBERS]
 });
 client.initEvents();
+client.initSlashCommands();
 client.login(config_1.config.token);

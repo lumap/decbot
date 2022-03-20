@@ -29,18 +29,31 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 const fs_1 = __importDefault(require("fs"));
 const quick_db_1 = __importDefault(require("quick.db"));
+const discordModals = __importStar(require("discord-modals"));
 class BotClient extends discord_js_1.Client {
     constructor(options) {
         super(options);
         this.minesweeperGames = new Map();
+        this.slashCommands = new Map();
         this.db = quick_db_1.default;
+        discordModals.default(this);
     }
     async initEvents() {
         const events = fs_1.default.readdirSync(__dirname + "/../events/");
         for (const i in events) {
             let event = events[i];
             let fn = await Promise.resolve().then(() => __importStar(require(`../events/${event}`)));
-            this.on(event.slice(0, -3), fn.event);
+            this.on(event.slice(0, -3), (...args) => {
+                fn.event(...args, this);
+            });
+        }
+    }
+    async initSlashCommands() {
+        const commands = fs_1.default.readdirSync(__dirname + "/../slashCommands/");
+        for (const i in commands) {
+            let cmd = commands[i];
+            let fn = await Promise.resolve().then(() => __importStar(require(`../slashCommands/${cmd}`)));
+            this.slashCommands.set(cmd.slice(0, -3), fn);
         }
     }
 }

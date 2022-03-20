@@ -12,5 +12,3 @@ export const emojis = {
     'seven': '<:tile7:954038024344313857>',
     'eight': '<:tile8:954038024356921475>'
 }
-
-export const announceCoins = "940170551824117801"
