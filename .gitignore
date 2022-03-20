@@ -2,3 +2,4 @@ json.sqlite
 config.ts
 package-lock.json
 node_modules
+dist
