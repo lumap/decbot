@@ -7,7 +7,7 @@ import { fixId } from "../functions/fixId";
 export async function event(modal: ModalSubmitInteraction, client: BotClient) {
     let box = modal.getTextInputValue("ms-box"), tile_str = "", tile: number[] = [];
     const gameId = modal.customId.split("-")[modal.customId.split("-").length - 1]
-    const game = client.minesweeperGames.get(gameId)
+    const game = client.minesweeperGames.get(gameId)!
     if (!game) {
         await modal.deferReply({ ephemeral: true })
         return modal.followUp({
@@ -16,7 +16,7 @@ export async function event(modal: ModalSubmitInteraction, client: BotClient) {
         })
     }
     try {
-        tile = [parseInt(box[0]) - 1, parseInt(box[2]) - 1]
+        tile = [parseInt(box[2]) - 1, parseInt(box[0]) - 1]
         tile_str = `${tile[0]} ${tile[1]}`
         if (box[1] !== "," || !game.matrix[tile[0]] || !game.matrix[0][tile[1]] || tile[0] < -1 || tile[0] > 6 || tile[1] < -1 || tile[1] > 8) {
             await modal.deferReply({ ephemeral: true })
@@ -43,17 +43,42 @@ export async function event(modal: ModalSubmitInteraction, client: BotClient) {
                 })
                 return;
             }
-            const box_content = game.matrix[tile[0]][tile[1]]
-            if (box_content == "boom") {
+            const tile_content = game.matrix[tile[0]][tile[1]]
+            if (tile_content == "boom") {
                 game.remainingHP -= 1
                 if (game.remainingHP == 0) {
                     modal.update({ components: [], content: renderGrid(game, true) }).then(() => client.minesweeperGames.delete(game.id))
                     return;
                 }
-                game.revealed.push("" + tile_str)
-            } else (
-                game.revealed.push("" + tile_str)
-            )
+            } else {
+                function reveal(arr: number[]) {
+                    game.revealed.push(`${arr[0]} ${arr[1]}`)
+                    if (game.matrix[arr[0]][arr[1]] == 'zero') {
+                        for (let i = -1; i < 2; i++) {
+                            for (let j = -1; j < 2; j++) {
+                                if (i === 0 && j === 0) {
+                                    continue
+                                }
+                                if (!game.matrix[i + arr[0]] || !game.matrix[i + arr[0]][j + arr[1]]) {
+                                    continue;
+                                }
+                                if (game.revealed.includes(`${i + arr[0]} ${j + arr[1]}`)) {
+                                    continue
+                                }
+                                let cell = game.matrix[i + arr[0]][j + arr[1]]
+                                if (cell === "boom") {
+                                    continue;
+                                } else if (cell === "zero") {
+                                    reveal([i + arr[0], j + arr[1]])
+                                } else {
+                                    game.revealed.push(`${i + arr[0]} ${j + arr[1]}`)
+                                }
+                            }
+                        }
+                    }
+                }
+                reveal(tile)
+            }
             break;
         }
         case "ms-flag": {
@@ -84,13 +109,12 @@ export async function event(modal: ModalSubmitInteraction, client: BotClient) {
     }
     game.turn += 1;
     client.minesweeperGames.set(game.id, game)
-
     msButtons.components[0].setCustomId("ms-flag-" + game.id)
     msButtons.components[1].setCustomId("ms-unflag-" + game.id)
     msButtons.components[2].setCustomId("ms-reveal-" + game.id)
     msButtons.components[3].setCustomId("ms-stop-game-" + game.id)
     modal.update({
-        content: renderGrid(game, false),
+        content: renderGrid(client.minesweeperGames.get(game.id), false),
         components: [msButtons]
     })
 }
