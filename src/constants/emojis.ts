@@ -10,5 +10,8 @@ export const emojis = {
     "five": "<:tile5:954038024000393227>",
     "six": "<:tile6:954038024092655627>",
     "seven": "<:tile7:954038024344313857>",
-    "eight": "<:tile8:954038024356921475>"
+    "eight": "<:tile8:954038024356921475>",
+    "b": ":black_large_square:",
+    "g": ":green_square:",
+    "y": ":yellow_square:"
 }

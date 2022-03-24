@@ -2,12 +2,14 @@ import { Client, ClientOptions } from "discord.js";
 import fs from "fs";
 import db from "quick.db";
 import * as discordModals from "discord-modals"
-
+import { possibleWordleSolutions } from "../constants/wordle"
 
 class BotClient extends Client {
     minesweeperGames: minesweeperGame;
     db: any;
-    slashCommands: Map<string,{execute: Function}>
+    slashCommands: Map<string, { execute: Function }>;
+    wordle: string;
+    dailyWordleGuessedIds: Array<string>;
 
     constructor(options: ClientOptions) {
         super(options);
@@ -15,6 +17,8 @@ class BotClient extends Client {
         this.slashCommands = new Map()
         this.db = db;
         discordModals.default(this);
+        this.wordle = ""
+        this.dailyWordleGuessedIds = []
     }
 
     async initEvents() {
@@ -23,7 +27,7 @@ class BotClient extends Client {
             let event = events[i]
             let fn = await import(`../events/${event}`)
             this.on(event.slice(0, -3), (...args) => {
-                fn.event(...args,this)
+                fn.event(...args, this)
             })
         }
     }
@@ -33,7 +37,7 @@ class BotClient extends Client {
         for (const i in commands) {
             let cmd = commands[i]
             let fn = await import(`../slashCommands/${cmd}`)
-            this.slashCommands.set(cmd.slice(0, -3),fn)
+            this.slashCommands.set(cmd.slice(0, -3), fn)
         }
     }
 
