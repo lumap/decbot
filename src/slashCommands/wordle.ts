@@ -7,11 +7,7 @@ import { timeUntilMidnight } from "../functions/timeUntilMidnight";
 export function execute(interaction: CommandInteraction, client: BotClient) {
     const mode = interaction.options.getString("mode")!
     if (mode == "daily") {
-        interaction.reply({
-            content: "This mode isn't available yet! Try unlimited tho :eye::eye:",
-            ephemeral: true
-        })
-        /*if (client.dailyWordleGuessedIds.includes(interaction.user.id)) {
+        if (client.dailyWordleGuessedIds.includes(interaction.user.id)) {
             return interaction.reply({
                 content: "You already guessed today's word! Come back in " + timeUntilMidnight()
             })
@@ -19,7 +15,7 @@ export function execute(interaction: CommandInteraction, client: BotClient) {
         const row = new MessageActionRow()
             .addComponents([
                 new MessageButton()
-                    .setCustomId("wordle-daily-" + client.wordle)
+                    .setCustomId("wordle-daily-" + client.db.get("wordle"))
                     .setLabel("Guess a word")
                     .setStyle("SUCCESS"),
                 new MessageButton()
@@ -32,7 +28,6 @@ export function execute(interaction: CommandInteraction, client: BotClient) {
             content: "Guess the daily wordle! Press the button to begin guessing today's word in 6 tries",
             components: [row]
         })
-        */
     } else if (mode == "unlimited") {
         const row = new MessageActionRow()
             .addComponents([

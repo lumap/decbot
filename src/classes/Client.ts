@@ -3,6 +3,7 @@ import fs from "fs";
 import db from "quick.db";
 import * as discordModals from "discord-modals"
 import { possibleWordleSolutions } from "../constants/wordle"
+import schedule from "node-schedule"
 
 class BotClient extends Client {
     minesweeperGames: minesweeperGame;
@@ -19,6 +20,7 @@ class BotClient extends Client {
         discordModals.default(this);
         this.wordle = ""
         this.dailyWordleGuessedIds = []
+        this.initWordle()
     }
 
     async initEvents() {
@@ -39,6 +41,15 @@ class BotClient extends Client {
             let fn = await import(`../slashCommands/${cmd}`)
             this.slashCommands.set(cmd.slice(0, -3), fn)
         }
+    }
+
+    initWordle() {
+        let client = this;
+        schedule.scheduleJob("* 0 * * *", function () {
+            client.db.set("wordle", possibleWordleSolutions[Math.round(Math.random() * possibleWordleSolutions.length)])
+            client.dailyWordleGuessedIds = []
+            console.log("Word has been set!")
+        })
     }
 
 }

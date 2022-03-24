@@ -6,6 +6,6 @@ export function timeUntilMidnight(): string {
     midnight.setMilliseconds(0);
     const totalMinutes = (midnight.getTime() - new Date().getTime()) / 1000 / 60;
     const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    return `${hours > 0 ? "${hours} hours and " : ""}${minutes} minutes`
+    const minutes = Math.round(totalMinutes % 60);
+    return `${hours > 0 ? hours + "hours and " : ""}${minutes} minutes`
 }

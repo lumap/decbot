@@ -7,6 +7,7 @@ import { emojis } from "../constants/emojis";
 import { setCharAt } from "../functions/setCharAt";
 import { MessageActionRow, MessageButton } from "discord.js";
 import { possibleWordleGuess, possibleWordleSolutions } from "../constants/wordle";
+import { countLetter } from "../functions/countLetter";
 
 export async function event(modal: ModalSubmitInteraction, client: BotClient) {
     if (modal.customId.startsWith("ms")) {
@@ -123,6 +124,7 @@ export async function event(modal: ModalSubmitInteraction, client: BotClient) {
             components: [msButtons]
         })
     } else if (modal.customId.startsWith("wordle")) {
+        const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
         let guess = modal.getTextInputValue("wordle-guess"),
             type = modal.customId.split("-")[1],
             solution = modal.customId.split("-")[2],
@@ -157,18 +159,52 @@ export async function event(modal: ModalSubmitInteraction, client: BotClient) {
                 str += "\n\nCongrats, you found the word! 0.75 DECoins have been added to your balance."
             }
         } else {
-            for (let i = 0; i < 5; i++) {
-                const char = guess[i]
-                if (!solution.includes(char)) {
-                    str += emojis["b"]
-                } else {
-                    if (solution[i] === char) {
-                        str += emojis["g"]
-                    } else {
-                        str += emojis["y"]
+            const result = new Array(solution.length).fill({});
+
+            const userWord = guess.toLowerCase().split('');
+
+
+            // Set correctly guessed letters to green
+            userWord.forEach((letter, index) => {
+                if (letter === solution[index]) {
+                    result[index] = {
+                        ...result[index],
+                        letter,
+                        color: 'g',
+                    };
+                }
+            });
+
+            // Set wrongly placed letters to yellow
+            userWord.forEach((letter, index) => {
+                if (!result[index].color && solution.includes(letter)) {
+                    const matchingResultLetters = result.filter((item) => item.letter === letter);
+                    const matchingWordOfTheDayLetters = solution.split("").filter((item) => item === letter);
+
+                    if (matchingResultLetters.length < matchingWordOfTheDayLetters.length) {
+                        result[index] = {
+                            ...result[index],
+                            letter,
+                            color: 'y',
+                        };
                     }
                 }
-            }
+            });
+
+            // Set all other letters to none
+            userWord.forEach((letter, index) => {
+                if (!result[index].color) {
+                    result[index] = {
+                        ...result[index],
+                        letter,
+                        color: 'b',
+                    };
+                }
+            });
+
+            result.forEach(letter => {
+                str += emojis[letter.color]
+            })
         }
         if (parseInt(guessCount) + 1 == 6) { //sixth try and they failed
             if (type == "daily") {
