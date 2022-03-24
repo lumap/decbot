@@ -10,7 +10,6 @@ class BotClient extends Client {
     db: any;
     slashCommands: Map<string, { execute: Function }>;
     wordle: string;
-    dailyWordleGuessedIds: Array<string>;
 
     constructor(options: ClientOptions) {
         super(options);
@@ -19,7 +18,6 @@ class BotClient extends Client {
         this.db = db;
         discordModals.default(this);
         this.wordle = ""
-        this.dailyWordleGuessedIds = []
         this.initWordle()
     }
 
@@ -47,7 +45,7 @@ class BotClient extends Client {
         let client = this;
         schedule.scheduleJob("* 0 * * *", function () {
             client.db.set("wordle", possibleWordleSolutions[Math.round(Math.random() * possibleWordleSolutions.length)])
-            client.dailyWordleGuessedIds = []
+            client.db.set("wordleGuessedIds", [])
             console.log("Word has been set!")
         })
     }

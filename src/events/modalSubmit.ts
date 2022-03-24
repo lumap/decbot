@@ -151,7 +151,7 @@ export async function event(modal: ModalSubmitInteraction, client: BotClient) {
                 str += emojis["g"]
             }
             if (type == "daily") {
-                client.dailyWordleGuessedIds.push(modal.user.id)
+                client.db.push("wordleGuessedIds", modal.user.id)
                 client.db.add(`coins.${modal.user.id}`, 2)
                 str += "\n\nCongrats, you found today's word! One DECoin has been added to your balance."
             } else {
@@ -208,7 +208,7 @@ export async function event(modal: ModalSubmitInteraction, client: BotClient) {
         }
         if (parseInt(guessCount) + 1 == 6) { //sixth try and they failed
             if (type == "daily") {
-                client.dailyWordleGuessedIds.push(modal.user.id)
+                client.db.push("wordleGuessedIds", modal.user.id)
             }
             str += `\n\nOh no, you didn't found the word! It was **${solution}** :(`;
             row = []
