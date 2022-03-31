@@ -7,5 +7,5 @@ export function timeUntilMidnight(): string {
     const totalMinutes = (midnight.getTime() - new Date().getTime()) / 1000 / 60;
     const hours = Math.floor(totalMinutes / 60);
     const minutes = Math.round(totalMinutes % 60);
-    return `${hours > 0 ? hours + "hours and " : ""}${minutes} minutes`
+    return `${hours > 0 ? hours + " hour" + (hours == 1 ? "" : "s") + " and " : ""}${minutes} minutes`
 }

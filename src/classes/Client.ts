@@ -43,7 +43,7 @@ class BotClient extends Client {
 
     initWordle() {
         let client = this;
-        schedule.scheduleJob("* 0 * * *", function () {
+        schedule.scheduleJob("0 0 0 * * *", function () {
             client.db.set("wordle", possibleWordleSolutions[Math.round(Math.random() * possibleWordleSolutions.length)])
             client.db.set("wordleGuessedIds", [])
             console.log("Word has been set!")

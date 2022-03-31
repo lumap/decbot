@@ -5,9 +5,8 @@ import { msButtons } from "../constants/msButtons";
 import { fixId } from "../functions/fixId";
 import { emojis } from "../constants/emojis";
 import { setCharAt } from "../functions/setCharAt";
-import { MessageActionRow, MessageButton } from "discord.js";
+import { Interaction, MessageActionRow, MessageButton } from "discord.js";
 import { possibleWordleGuess, possibleWordleSolutions } from "../constants/wordle";
-import { countLetter } from "../functions/countLetter";
 
 export async function event(modal: ModalSubmitInteraction, client: BotClient) {
     if (modal.customId.startsWith("ms")) {
@@ -124,10 +123,9 @@ export async function event(modal: ModalSubmitInteraction, client: BotClient) {
             components: [msButtons]
         })
     } else if (modal.customId.startsWith("wordle")) {
-        const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
-        let guess = modal.getTextInputValue("wordle-guess"),
+        let guess = modal.getTextInputValue("wordle-guess").toLowerCase(),
             type = modal.customId.split("-")[1],
-            solution = modal.customId.split("-")[2],
+            solution = modal.customId.split("-")[2].toLowerCase(),
             guessCount = modal.message.content[6],
             str = modal.message.editedAt ? setCharAt(modal.message.content, 6, String(parseInt(guessCount) + 1)) + "\n" : "Guess 1/6\n\n";
         if (!possibleWordleGuess.includes(guess) && !possibleWordleSolutions.includes(guess)) {
@@ -150,14 +148,21 @@ export async function event(modal: ModalSubmitInteraction, client: BotClient) {
             for (let i = 0; i < 5; i++) {
                 str += emojis["g"]
             }
+            str += ` - ||${solution.toUpperCase()}||`
             if (type == "daily") {
-                client.db.push("wordleGuessedIds", modal.user.id)
+                let arr = client.db.get("wordleGuessedIds");
+                arr.push(modal.user.id);
+                client.db.set("wordleGuessedIds", arr);
                 client.db.add(`coins.${modal.user.id}`, 2)
-                str += "\n\nCongrats, you found today's word! One DECoin has been added to your balance."
+                str += "\n\nCongrats, you found today's word! Two DECoins have been added to your balance."
             } else {
                 client.db.add(`coins.${modal.user.id}`, 0.5)
                 str += "\n\nCongrats, you found the word! 0.75 DECoins have been added to your balance."
             }
+            return modal.update({
+                content: str,
+                components: row
+            })
         } else {
             const result = new Array(solution.length).fill({});
 
@@ -205,12 +210,15 @@ export async function event(modal: ModalSubmitInteraction, client: BotClient) {
             result.forEach(letter => {
                 str += emojis[letter.color]
             })
+            str += ` - ||${guess.toUpperCase()}||`
         }
         if (parseInt(guessCount) + 1 == 6) { //sixth try and they failed
             if (type == "daily") {
-                client.db.push("wordleGuessedIds", modal.user.id)
+                let arr = client.db.get("wordleGuessedIds");
+                arr.push(modal.user.id);
+                client.db.set("wordleGuessedIds", arr);
             }
-            str += `\n\nOh no, you didn't found the word! It was **${solution}** :(`;
+            str += `\n\nOh no, you didn't found the word! It was ||**${solution}**|| :(`;
             row = []
         }
         modal.update({

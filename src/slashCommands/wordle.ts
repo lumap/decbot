@@ -6,10 +6,12 @@ import { timeUntilMidnight } from "../functions/timeUntilMidnight";
 
 export function execute(interaction: CommandInteraction, client: BotClient) {
     const mode = interaction.options.getString("mode")!
+    const wordleGuessedIds = client.db.get("wordleGuessedIds")
     if (mode == "daily") {
-        if (client.db.get("wordleGuessedIds").includes(interaction.user.id)) {
+        if (wordleGuessedIds.includes(interaction.user.id)) {
             return interaction.reply({
-                content: "You already guessed today's word! Come back in " + timeUntilMidnight()
+                content: "You already guessed today's word! Come back in " + timeUntilMidnight(),
+                ephemeral: true
             })
         }
         const row = new MessageActionRow()
