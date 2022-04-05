@@ -8,7 +8,8 @@ let date = Date.now();
 export default date
 
 const client = new BotClient({
-    intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.GUILD_MEMBERS]
+    intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.GUILD_MEMBERS],
+    ws: { properties: { $browser: "Discord iOS" } }
 })
 
 client.initEvents()
