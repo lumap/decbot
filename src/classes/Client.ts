@@ -10,11 +10,13 @@ class BotClient extends Client {
     db: any;
     slashCommands: Map<string, { execute: Function }>;
     wordle: string;
+    buttonHandlers: Map<string, { execute: Function }>;
 
     constructor(options: ClientOptions) {
         super(options);
         this.minesweeperGames = new Map();
-        this.slashCommands = new Map()
+        this.slashCommands = new Map();
+        this.buttonHandlers = new Map();
         this.db = db;
         discordModals.default(this);
         this.wordle = ""
@@ -38,6 +40,15 @@ class BotClient extends Client {
             let cmd = commands[i]
             let fn = await import(`../slashCommands/${cmd}`)
             this.slashCommands.set(cmd.slice(0, -3), fn)
+        }
+    }
+
+    async initButtonHandlers() {
+        const buttonHandlers = fs.readdirSync(__dirname + "/../buttons/")
+        for (const i in buttonHandlers) {
+            let cmd = buttonHandlers[i]
+            let fn = await import(`../buttons/${cmd}`)
+            this.buttonHandlers.set(cmd.slice(0, -3), fn)
         }
     }
 

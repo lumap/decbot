@@ -4,14 +4,14 @@ import { config } from "../../config"
 
 export async function execute(interaction: CommandInteraction, _client: BotClient) {
     //@ts-ignore
-    if (!interaction.member?.roles.cache.has("932115827937923102")) {
+    if (!interaction.member?.roles.cache.has(config.modRole)) {
         return interaction.reply({
             content: "No.",
             ephemeral: true
         })
     }
     let reason = interaction.options.getString("reason"), user = interaction.options.getUser("user")!;
-    if (interaction.guild?.members.cache.get(user.id)!.roles.cache.has("932115827937923102")) {
+    if (interaction.guild?.members.cache.get(user.id)!.roles.cache.has(config.modRole)) {
         return interaction.reply({
             content: "Can't ban a mod...",
             ephemeral: true

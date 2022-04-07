@@ -1,4 +1,5 @@
 export const config = {
     token: "",
-    unbanAppealForm: ""
+    unbanAppealForm: "",
+    modRole: ""
 }

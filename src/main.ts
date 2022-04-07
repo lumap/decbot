@@ -14,5 +14,6 @@ const client = new BotClient({
 
 client.initEvents()
 client.initSlashCommands()
+client.initButtonHandlers()
 
 client.login(config.token)

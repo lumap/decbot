@@ -1,10 +1,11 @@
 import { CommandInteraction, MessageEmbed } from "discord.js";
+import { config } from "../../config";
 import BotClient from "../classes/Client";
 
 export async function execute(interaction: CommandInteraction, client: BotClient) {
     switch (interaction.options.getSubcommand()) {
         case "add": { //@ts-ignore
-            if (!interaction.member.roles.cache.has("932115827937923102")) {
+            if (!interaction.member.roles.cache.has(config.modRole)) {
                 return interaction.reply({
                     ephemeral: true,
                     content: "You're not allowed to do this!"
@@ -32,7 +33,7 @@ export async function execute(interaction: CommandInteraction, client: BotClient
             break;
         };
         case "delete": { //@ts-ignore
-            if (!interaction.member.roles.cache.has("932115827937923102")) {
+            if (!interaction.member.roles.cache.has(config.modRole)) {
                 return interaction.reply({
                     ephemeral: true,
                     content: "You're not allowed to do this!"
