@@ -1,4 +1,4 @@
-import { Interaction, MessageActionRow, MessageButton } from "discord.js";
+import { GuildMemberRoleManager, Interaction, MessageActionRow, MessageButton } from "discord.js";
 import BotClient from "../classes/Client";
 import * as discordModals from "discord-modals"
 import { renderGrid } from "../functions/renderGrid";
@@ -118,6 +118,28 @@ export function event(interaction: Interaction, client: BotClient) {
                 client: client,
                 interaction: interaction
             })
+        } else if (interaction.customId.startsWith("rr")) {
+            const roleId = interaction.customId.split("-")[1];
+            if (!interaction.guild?.roles.cache.has(roleId)) {
+                return interaction.reply({
+                    content: "Looks like this role does not exist anymore...",
+                    ephemeral: true
+                });
+            }
+            //@ts-ignore
+            if (interaction.member!.roles.cache.has(roleId)) { //@ts-ignore
+                interaction.member!.roles.remove(roleId)
+                interaction.reply({
+                    content: "Role removed!",
+                    ephemeral: true
+                })
+            } else { //@ts-ignore
+                interaction.member!.roles.add(roleId)
+                interaction.reply({
+                    content: "Role added!",
+                    ephemeral: true
+                })
+            }
         }
     }
 }

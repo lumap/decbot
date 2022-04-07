@@ -129,5 +129,77 @@
 				]
 			}
 		]
+	},
+	{
+		"type": 1,
+		"name": "wordle",
+		"description": "Do a wordle with me!",
+		"options": [
+			{
+				"type": 3,
+				"name": "mode",
+				"description": "Which mode do you want to play?",
+				"required": true,
+				"choices": [
+					{
+						"name": "Daily",
+						"value": "daily"
+					},
+					{
+						"name": "Unlimited",
+						"value": "unlimited"
+					}
+				]
+			}
+		]
+	},
+	{
+		"type": 1,
+		"name": "petpet",
+		"description": "Pet someone.",
+		"options": [
+			{
+				"type": 6,
+				"name": "user",
+				"description": "Who do you want to pet?",
+				"required": true
+			}
+		]
+	},
+	{
+		"type": 1,
+		"name": "ban",
+		"description": "Ban someone.",
+		"options": [
+			{
+				"type": 6,
+				"name": "user",
+				"description": "Who do you want to ban?",
+				"required": true
+			},
+			{
+				"type": 3,
+				"name": "reason",
+				"description": "Why?"
+			}
+		]
+	},
+	{
+		"type": 1,
+		"name": "reaction-role",
+		"description": "Create a button reaction role.",
+		"options": [
+			{
+				"type": 8,
+				"name": "role",
+				"description": "Which role?",
+				"required": true
+			},
+			{
+				"type": 3,
+				"name": "message",
+				"description": "What do you want me to say?"
+			}
+		]
 	}
 ]
