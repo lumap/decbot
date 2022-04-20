@@ -3,3 +3,4 @@ config.ts
 package-lock.json
 node_modules
 dist
+src/events/guildMemberUpdate.ts

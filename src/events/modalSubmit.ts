@@ -153,10 +153,10 @@ export async function event(modal: ModalSubmitInteraction, client: BotClient) {
                 let arr = client.db.get("wordleGuessedIds");
                 arr.push(modal.user.id);
                 client.db.set("wordleGuessedIds", arr);
-                client.db.add(`coins.${modal.user.id}`, 2)
+                client.db.add(`coins.${modal.user.id}`, 200)
                 str += "\n\nCongrats, you found today's word! Two pancoins have been added to your balance."
             } else {
-                client.db.add(`coins.${modal.user.id}`, 0.5)
+                client.db.add(`coins.${modal.user.id}`, 75)
                 str += "\n\nCongrats, you found the word! 0.75 pancoins have been added to your balance."
             }
             return modal.update({

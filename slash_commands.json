@@ -42,7 +42,14 @@
 					{
 						"type": 4,
 						"name": "quantity",
-						"description": "How many of them there should be"
+						"description": "How many of them there should be",
+						"required": false
+					},
+					{
+						"type": 8,
+						"name": "role",
+						"description": "Attach a role to this.",
+						"required": false
 					}
 				]
 			},
@@ -150,19 +157,6 @@
 						"value": "unlimited"
 					}
 				]
-			}
-		]
-	},
-	{
-		"type": 1,
-		"name": "petpet",
-		"description": "Pet someone.",
-		"options": [
-			{
-				"type": 6,
-				"name": "user",
-				"description": "Who do you want to pet?",
-				"required": true
 			}
 		]
 	},

@@ -10,7 +10,7 @@ export async function addCoin(id: string, amount: number, client: BotClient) {
         const channel = await client.channels.fetch(announceCoins);
         if (!channel || !channel.isText()) return;
         channel.send({
-            content: `<@${id}> just earned another DECoin! Their total balance is now **${Math.floor(coins / 100 + amount / 100)}**!`,
+            content: `<@${id}> just earned another pancoin! Their total balance is now **${Math.floor(coins / 100 + amount / 100)}**!`,
             allowedMentions: { parse: [] }
         })
     }

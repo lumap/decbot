@@ -24,7 +24,8 @@ export async function execute(interaction: CommandInteraction, client: BotClient
             client.db.set(`items.${name}`, {
                 price: interaction.options.getInteger("price"),
                 description: interaction.options.getString("description"),
-                quantity: interaction.options.getInteger("quantity") || -1
+                quantity: interaction.options.getInteger("quantity") || -1,
+                role: interaction.options.getRole("role")?.id || null
             })
             interaction.reply({
                 content: "Item successfully added!",
@@ -64,15 +65,18 @@ export async function execute(interaction: CommandInteraction, client: BotClient
                 })
             }
             client.db.set("coins." + interaction.user.id, client.db.get("coins." + interaction.user.id) - client.db.get(`items.${name}.price`) * 100)
-            if (client.db.get(`items.${name}.quantity`) != -1) {
-                if (client.db.get(`items.${name}.quantity`) - 1 === 0) {
+            if (client.db.get(`items.${name}.role`)) { //@ts-ignore
+                interaction.member?.roles.add(client.db.get(`items.${name}.role`))
+            }
+            if (parseInt(client.db.get(`items.${name}.quantity`)) != -1) {
+                if (parseInt(client.db.get(`items.${name}.quantity`)) - 1 < 1) {
                     client.db.delete(`items.${name}`);
                 } else {
                     client.db.set(`items.${name}.quantity`, parseInt(`items.${name}.quantity`) - 1)
                 }
             }
             interaction.reply({
-                content: "Item **" + name + "** successfully bought! If the item requires any mod help (an emoji slot), please go to <#937827035177422929>.",
+                content: "Item **" + name + "** successfully bought! If the item requires any mod help (an emoji slot), please go to <#937827035177422929>. Please note that roles are given automatically.",
                 ephemeral: true
             })
             const channel = await client.channels.fetch("940291076516888656");
@@ -84,7 +88,7 @@ export async function execute(interaction: CommandInteraction, client: BotClient
             const items = client.db.get("items");
             let list = [];
             for (const [key, value] of Object.entries(items)) { //@ts-ignore
-                list.push({ inline: true, name: key, value: `**Description**: ${value.description}\n**Price**:${value.price}\n**Quantity**: ${value.quantity == -1 ? "Unlimited" : value.quantity}` })
+                list.push({ name: key, value: `**Description**: ${value.description}\n**Price**:${value.price}\n**Quantity**: ${value.quantity == -1 ? "Unlimited" : value.quantity}${value.role ? `\n**Role**: <@&${value.role}>` : ""}` })
             }
             let embed = new MessageEmbed()
                 .setColor("BLURPLE")
