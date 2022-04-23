@@ -4,7 +4,7 @@ import BotClient from "../classes/Client";
 
 export async function execute(interaction: CommandInteraction, _client: BotClient) {
     //@ts-ignore
-    if (!interaction.member!.roles.cache.has(config.modRole)) {
+    if (!interaction.member?.permissions.has("MANAGE_GUILD")) {
         return interaction.reply({
             ephemeral: true,
             content: "You're not allowed to do this!"

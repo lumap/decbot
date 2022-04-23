@@ -5,23 +5,23 @@ import BotClient from "../classes/Client";
 export async function execute(interaction: CommandInteraction, client: BotClient) {
     switch (interaction.options.getSubcommand()) {
         case "add": { //@ts-ignore
-            if (!interaction.member.roles.cache.has(config.modRole)) {
+            if (!interaction.member?.permissions.has("MANAGE_GUILD")) {
                 return interaction.reply({
                     ephemeral: true,
                     content: "You're not allowed to do this!"
                 })
             }
             const name = interaction.options.getString("name");
-            if (!client.db.get("items")) client.db.set("items", {});
-            if (Object.keys(client.db.get("items")).length == 25) return interaction.reply({
+            if (!client.db.get("shop." + interaction.guild!.id)) client.db.set("shop." + interaction.guild!.id, {});
+            if (Object.keys(client.db.get("shop." + interaction.guild!.id)).length == 25) return interaction.reply({
                 content: "Sorry, but there's too much items in the shop.Please remove one.",
                 ephemeral: true
             })
-            if (!!client.db.get(`items.${name}`)) return interaction.reply({
+            if (!!client.db.get(`items.${interaction.guild!.id}.${name}`)) return interaction.reply({
                 content: "An item with this name already exists.",
                 ephemeral: true
             })
-            client.db.set(`items.${name}`, {
+            client.db.set(`items.${interaction.guild!.id}.${name}`, {
                 price: interaction.options.getInteger("price"),
                 description: interaction.options.getString("description"),
                 quantity: interaction.options.getInteger("quantity") || -1,
@@ -34,18 +34,18 @@ export async function execute(interaction: CommandInteraction, client: BotClient
             break;
         };
         case "delete": { //@ts-ignore
-            if (!interaction.member.roles.cache.has(config.modRole)) {
+            if (!interaction.member?.permissions.has("MANAGE_GUILD")) {
                 return interaction.reply({
                     ephemeral: true,
                     content: "You're not allowed to do this!"
                 })
             }
             const name = interaction.options.getString("name");
-            if (!client.db.get(`items.${name}`)) return interaction.reply({
+            if (!client.db.get(`items.${interaction.guild!.id}.${name}`)) return interaction.reply({
                 content: "There is no items with this name.",
                 ephemeral: true
             })
-            client.db.delete(`items.${name}`);
+            client.db.delete(`items.${interaction.guild!.id}.${name}`);
             interaction.reply({
                 content: "Item successfully deleted!",
                 ephemeral: true
@@ -54,38 +54,40 @@ export async function execute(interaction: CommandInteraction, client: BotClient
         };
         case "buy": {
             const name = interaction.options.getString("name");
-            if (!client.db.get(`items.${name}`)) return interaction.reply({
+            if (!client.db.get(`items.${interaction.guild!.id}.${name}`)) return interaction.reply({
                 content: "There is no items with this name.",
                 ephemeral: true
             })
-            if (client.db.get("coins." + interaction.user.id) < client.db.get(`items.${name}.price`) * 100) {
+            if (client.db.get("coins." + interaction.user.id) < client.db.get(`items.${interaction.guild!.id}.${name}.price`) * 100) {
                 return interaction.reply({
                     content: "You are too broke to buy this!",
                     ephemeral: true
                 })
             }
-            client.db.set("coins." + interaction.user.id, client.db.get("coins." + interaction.user.id) - client.db.get(`items.${name}.price`) * 100)
-            if (client.db.get(`items.${name}.role`)) { //@ts-ignore
-                interaction.member?.roles.add(client.db.get(`items.${name}.role`))
+            client.db.set("coins." + interaction.user.id, client.db.get("coins." + interaction.user.id) - client.db.get(`items.${interaction.guild!.id}.${name}.price`) * 100)
+            if (client.db.get(`items.${interaction.guild!.id}.${name}.role`)) { //@ts-ignore
+                interaction.member?.roles.add(client.db.get(`items.${interaction.guild!.id}.${name}.role`))
             }
-            if (parseInt(client.db.get(`items.${name}.quantity`)) != -1) {
-                if (parseInt(client.db.get(`items.${name}.quantity`)) - 1 < 1) {
-                    client.db.delete(`items.${name}`);
+            if (parseInt(client.db.get(`items.${interaction.guild!.id}.${name}.quantity`)) != -1) {
+                if (parseInt(client.db.get(`items.${interaction.guild!.id}.${name}.quantity`)) - 1 < 1) {
+                    client.db.delete(`items.${interaction.guild!.id}.${name}`);
                 } else {
-                    client.db.set(`items.${name}.quantity`, parseInt(`items.${name}.quantity`) - 1)
+                    client.db.set(`items.${interaction.guild!.id}.${name}.quantity`, parseInt(`items.${interaction.guild!.id}.${name}.quantity`) - 1)
                 }
             }
             interaction.reply({
-                content: "Item **" + name + "** successfully bought! If the item requires any mod help (an emoji slot), please go to <#937827035177422929>. Please note that roles are given automatically.",
+                content: "Item **" + name + "** successfully bought! If you just bought a role, you should now have it.",
                 ephemeral: true
             })
-            const channel = await client.channels.fetch("940291076516888656");
-            if (!channel || !channel.isText()) return;
-            channel.send(`<@${interaction.user.id}> bought the item **${name}**`)
+            if (interaction.guild!.id === "932099452771123210") {
+                const channel = await client.channels.fetch("940291076516888656");
+                if (!channel || !channel.isText()) return;
+                channel.send(`<@${interaction.user.id}> bought the item **${name}**`)
+            }
             break;
         };
         case "items": {
-            const items = client.db.get("items");
+            const items = client.db.get("shop." + interaction.guild!.id);
             let list = [];
             for (const [key, value] of Object.entries(items)) { //@ts-ignore
                 list.push({ name: key, value: `**Description**: ${value.description}\n**Price**:${value.price}\n**Quantity**: ${value.quantity == -1 ? "Unlimited" : value.quantity}${value.role ? `\n**Role**: <@&${value.role}>` : ""}` })
