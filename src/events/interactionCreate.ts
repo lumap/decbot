@@ -2,6 +2,7 @@ import { GuildMemberRoleManager, Interaction, MessageActionRow, MessageButton } 
 import BotClient from "../classes/Client";
 
 export function event(interaction: Interaction, client: BotClient) {
+    if (!interaction.guild) return;
     if (interaction.isCommand()) {
         const cmd = client.slashCommands.get(interaction.commandName)
         if (!cmd) return console.log(interaction.commandName)
