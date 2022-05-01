@@ -17,11 +17,11 @@ export async function execute(interaction: CommandInteraction, client: BotClient
                 content: "Sorry, but there's too much items in the shop.Please remove one.",
                 ephemeral: true
             })
-            if (!!client.db.get(`items.${interaction.guild!.id}.${name}`)) return interaction.reply({
+            if (!!client.db.get(`shop.${interaction.guild!.id}.${name}`)) return interaction.reply({
                 content: "An item with this name already exists.",
                 ephemeral: true
             })
-            client.db.set(`items.${interaction.guild!.id}.${name}`, {
+            client.db.set(`shop.${interaction.guild!.id}.${name}`, {
                 price: interaction.options.getInteger("price"),
                 description: interaction.options.getString("description"),
                 quantity: interaction.options.getInteger("quantity") || -1,
@@ -41,11 +41,11 @@ export async function execute(interaction: CommandInteraction, client: BotClient
                 })
             }
             const name = interaction.options.getString("name");
-            if (!client.db.get(`items.${interaction.guild!.id}.${name}`)) return interaction.reply({
+            if (!client.db.get(`shop.${interaction.guild!.id}.${name}`)) return interaction.reply({
                 content: "There is no items with this name.",
                 ephemeral: true
             })
-            client.db.delete(`items.${interaction.guild!.id}.${name}`);
+            client.db.delete(`shop.${interaction.guild!.id}.${name}`);
             interaction.reply({
                 content: "Item successfully deleted!",
                 ephemeral: true
@@ -54,25 +54,25 @@ export async function execute(interaction: CommandInteraction, client: BotClient
         };
         case "buy": {
             const name = interaction.options.getString("name");
-            if (!client.db.get(`items.${interaction.guild!.id}.${name}`)) return interaction.reply({
+            if (!client.db.get(`shop.${interaction.guild!.id}.${name}`)) return interaction.reply({
                 content: "There is no items with this name.",
                 ephemeral: true
             })
-            if (client.db.get("coins." + interaction.user.id) < client.db.get(`items.${interaction.guild!.id}.${name}.price`) * 100) {
+            if (client.db.get(`coins.${interaction.guildId}.${interaction.user.id}`) < client.db.get(`shop.${interaction.guild!.id}.${name}.price`) * 100) {
                 return interaction.reply({
                     content: "You are too broke to buy this!",
                     ephemeral: true
                 })
             }
-            client.db.set("coins." + interaction.user.id, client.db.get("coins." + interaction.user.id) - client.db.get(`items.${interaction.guild!.id}.${name}.price`) * 100)
-            if (client.db.get(`items.${interaction.guild!.id}.${name}.role`)) { //@ts-ignore
-                interaction.member?.roles.add(client.db.get(`items.${interaction.guild!.id}.${name}.role`))
+            client.db.set(`coins.${interaction.guildId}.${interaction.user.id}`, client.db.get(`coins.${interaction.guildId}.${interaction.user.id}`) - client.db.get(`shop.${interaction.guild!.id}.${name}.price`) * 100)
+            if (client.db.get(`shop.${interaction.guild!.id}.${name}.role`)) { //@ts-ignore
+                interaction.member?.roles.add(client.db.get(`shop.${interaction.guild!.id}.${name}.role`))
             }
-            if (parseInt(client.db.get(`items.${interaction.guild!.id}.${name}.quantity`)) != -1) {
-                if (parseInt(client.db.get(`items.${interaction.guild!.id}.${name}.quantity`)) - 1 < 1) {
-                    client.db.delete(`items.${interaction.guild!.id}.${name}`);
+            if (parseInt(client.db.get(`shop.${interaction.guild!.id}.${name}.quantity`)) != -1) {
+                if (parseInt(client.db.get(`shop.${interaction.guild!.id}.${name}.quantity`)) - 1 < 1) {
+                    client.db.delete(`shop.${interaction.guild!.id}.${name}`);
                 } else {
-                    client.db.set(`items.${interaction.guild!.id}.${name}.quantity`, parseInt(`items.${interaction.guild!.id}.${name}.quantity`) - 1)
+                    client.db.set(`shop.${interaction.guild!.id}.${name}.quantity`, parseInt(`shop.${interaction.guild!.id}.${name}.quantity`) - 1)
                 }
             }
             interaction.reply({
@@ -95,7 +95,7 @@ export async function execute(interaction: CommandInteraction, client: BotClient
             let embed = new MessageEmbed()
                 .setColor("BLURPLE")
                 .setTitle("Shop")
-                .setDescription("Here, you can find all the available shop items.")
+                .setDescription("Here, you can find all the available shop shop.")
                 .setFields(list)
             interaction.reply({
                 ephemeral: true,
