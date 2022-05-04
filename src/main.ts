@@ -17,3 +17,49 @@ client.initSlashCommands()
 client.initButtonHandlers()
 
 client.login(config.token)
+
+async function checkGiveaways() {
+    const giveaways: any[] = Object.entries(client.db.get("giveaways"));
+    for (let i = 0; i < giveaways.length; i++) {
+        const id = giveaways[i][0], giveaway: giveaway = giveaways[i][1]
+        if (giveaway.ended == false && giveaway.unix < Date.now()) {
+            const channel = await client.channels.fetch(giveaway.channel);
+            if (!channel || !channel.isText()) return;
+            let msg;
+            try {
+                msg = await channel.messages.fetch(id);
+            } catch {
+                client.db.delete(`giveaways.${id}`);
+                return;
+            }
+            if (!giveaway.entrants[0]) {
+                channel.send({
+                    content: "No one joined...",
+                    reply: {
+                        messageReference: id
+                    }
+                }).then().catch(() => { })
+            } else {
+                channel.send({
+                    content: `The winner is <@${giveaway.entrants[Math.round(Math.random() * giveaway.entrants.length)]}>, pog!`,
+                    reply: {
+                        messageReference: id
+                    }
+                }).then().catch(() => { })
+            }
+            giveaway.ended = true;
+            let embed = new Discord.MessageEmbed()
+                .setColor("RANDOM")
+                .setTitle(giveaway.title)
+                .setDescription(`${giveaway.description}\n\n**Ended!**`)
+            msg.edit({
+                embeds: [embed],
+                components: [],
+                content: "Giveaway ended!"
+            })
+            client.db.set("giveaways." + id, giveaway)
+        }
+    }
+}
+setInterval(checkGiveaways, 60000)
+setTimeout(checkGiveaways, 5000)

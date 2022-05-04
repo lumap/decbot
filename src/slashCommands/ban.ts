@@ -19,7 +19,7 @@ export async function execute(interaction: CommandInteraction, _client: BotClien
     }
     await interaction.deferReply();
     try {
-        await user.send(`You've been banned from **${interaction.guild!.name}**${reason ? " for the following reason: " + reason : ""}.${interaction.guild!.id == "932099452771123210" ? " If you wish to appeal your ban, fill out this form: ${config.unbanAppealForm}" : ""}`)
+        await user.send(`You've been banned from **${interaction.guild!.name}**${reason ? " for the following reason: " + reason : ""}.${interaction.guild!.id == "932099452771123210" ? ` If you wish to appeal your ban, fill out this form: ${config.unbanAppealForm}` : ""}`)
     } catch {
         "Couldn't DM member."
     }

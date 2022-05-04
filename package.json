@@ -6,7 +6,8 @@
     "discord.js-minesweeper": "^1.1.0",
     "node-schedule": "^2.1.0",
     "pet-pet-gif": "^1.0.9",
-    "quick.db": "^7.1.3"
+    "quick.db": "^7.1.3",
+    "timestamp-to-ms": "^1.0.0"
   },
   "scripts": {
     "start": "npx tsc && node ./dist/src/main.js"
