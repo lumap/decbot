@@ -5,7 +5,7 @@ export function execute(interaction: ButtonInteraction, client: BotClient) {
     const roleId = interaction.customId.split("-")[1];
     if (roleId === "cancel") {
         return interaction.update({
-            content: "Yep, that's what I though. Not removing it.",
+            content: "Yep, that's what I thought. Not removing it.",
             components: []
         })
     }

@@ -10,7 +10,7 @@ export function execute(interaction: ButtonInteraction, client: BotClient) {
     }
     client.db.push(`giveaways.${interaction.message.id}.entrants`, interaction.user.id);
     interaction.reply({
-        content: "Giveaway succesffully joined!",
+        content: "Giveaway successfully joined!",
         ephemeral: true
     })
 }

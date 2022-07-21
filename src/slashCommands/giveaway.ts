@@ -70,7 +70,7 @@ export async function execute(interaction: CommandInteraction, client: BotClient
                 msg.edit({
                     embeds: [embed],
                     components: [row],
-                    content: "Join below!"
+                    content: `Join below this giveaway created by ${interaction.user}!`
                 })
             } catch {
                 interaction.editReply({
@@ -121,7 +121,7 @@ export async function execute(interaction: CommandInteraction, client: BotClient
                 }).then().catch(() => { })
             } else {
                 channel.send({
-                    content: `The winner is <@${giveaway.entrants[Math.round(Math.random() * giveaway.entrants.length)]}>, pog!`,
+                    content: `Ok, so I went through all **${giveaway.entrants.length}** participants, and I had to pick a winner... The winner is <@${giveaway.entrants[Math.round(Math.random() * giveaway.entrants.length)]}>!!!!!!`,
                     reply: {
                         messageReference: id
                     }
@@ -154,7 +154,10 @@ export async function execute(interaction: CommandInteraction, client: BotClient
                     throw Error();
                 }
                 channel.send({
-                    content: `The new winner is <@${giveaway.entrants[Math.round(Math.random() * giveaway.entrants.length)]}>, pog!`
+                    content: `It looks like ${interaction.user} rerolled this giveaway... The new winner is <@${giveaway.entrants[Math.round(Math.random() * giveaway.entrants.length)]}>, pog!`,
+                    reply: {
+                        messageReference: id
+                    }
                 })
             } catch {
                 interaction.editReply({

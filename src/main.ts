@@ -41,7 +41,7 @@ async function checkGiveaways() {
                 }).then().catch(() => { })
             } else {
                 channel.send({
-                    content: `The winner is <@${giveaway.entrants[Math.round(Math.random() * giveaway.entrants.length)]}>, pog!`,
+                    content: `Ok, so I went through all **${giveaway.entrants.length}** participants, and I had to pick a winner... The winner is <@${giveaway.entrants[Math.round(Math.random() * giveaway.entrants.length)]}>!!!!!`,
                     reply: {
                         messageReference: id
                     }
